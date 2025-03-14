@@ -5,7 +5,9 @@
     
     obtener_distribucion_grados: nos devuelve la distribucion de grados de una red G en forma de lista en dónde la primera entrada es el         grado y la segunda entrada es la probabilidad de obtener un nodo con el grado de la primera entrada.  
    
+    grado_promedio: nos devuelve el grado promedio de la red que le pasemos
     
+    ataques: recibe una gráfica y un criterio de ataque, regresa la gráfica atacada por dicho criterio 
     
 """
 import networkx as nx
@@ -20,6 +22,7 @@ def crear_grafica(modelo,n,m,p):
   if modelo == "barabasi":
     G = nx.barabasi_albert_graph(n,m, seed = None)
   return G    
+
 
 def obtener_distribucion_grados(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
         N = len(G.nodes())
@@ -37,7 +40,21 @@ def obtener_distribucion_grados(G): #Con está función recibimos una red y devo
         distribucion_grados = [(grado,frecuencia/N) for grado,frecuencia in distribucion_grados.items()]
         return distribucion_grados
 
+    
+def grado_promedio(G):
+    grados = G.degree()
+    return sum(dict(grados).values())/len(G)
 
 
-
+def ataques(G,criterio):
+    if criterio == 'random':
+        nodos = list(G.nodes())
+        nodo_elegido = random.choice(nodos)
+        G.remove_node(nodo_elegido)
+        return G
+    elif criterio == 'degree':
+        nodo_grado_mayor = max(G.degree, key=lambda x: x[1])[0]
+        G.remove_node(nodo_grado_mayor)
+        return G
+    
 
