@@ -1,7 +1,7 @@
 import networkx as nx
 import numpy as np
 
-def entropia_normalizada_1(G): #Donde G es la red y N es el número de nodos en la red
+def entropia_normalizada_1(G): #Donde G es la red
     grados_nodos = list(G.degree())
     grados_nodos = [grados_nodos[i][1] for i in range(len(grados_nodos))]
     
@@ -27,20 +27,20 @@ def entropia_normalizada_2(G): # Donde G es la red y N es el número de nodos en
     return -sum(((k_i) / (sum(k_j for k_j in lista_k_i if k_i > 0))) * np.log10((k_i) / (sum(k_j for k_j in lista_k_i if k_i > 0))) 
                 for k_i in lista_k_i if k_i>0)
 
-def entropia_exponencial_1(G,q):#G es la red y q es un número natural
+def entropia_exponencial_1(G):#G es la red y q es un número natural
     grados_nodos = list(G.degree())
     grados_nodos = [grados_nodos[i][1] for i in range(len(grados_nodos))]
     
-    lista_k_i = [np.power(k_i,q) for k_i in grados_nodos] #Hasta aquí obtenemos la lista de los (k_i)^q
+    lista_k_i = [np.power(k_i,1) for k_i in grados_nodos] #Hasta aquí obtenemos la lista de los (k_i)^q
     
     return -sum(((k_i)/(sum(k_j for k_j in lista_k_i)))*np.log((k_i)/(sum(k_j for k_j in lista_k_i)))
                for k_i in lista_k_i)
     
-def entropia_exponencial_2(G,q):#G es la red y q es un número natural
+def entropia_exponencial_2(G):#G es la red y q es un número natural
     grados_nodos = list(G.degree())
     grados_nodos = [grados_nodos[i][1] for i in range(len(grados_nodos))]
     
-    lista_k_i = [np.power(k_i,q) for k_i in grados_nodos] #Hasta aquí obtenemos la lista de los (k_i)^q
+    lista_k_i = [np.power(k_i,1) for k_i in grados_nodos] #Hasta aquí obtenemos la lista de los (k_i)^q
  
     return -sum(((k_i)/(sum(k_j for k_j in lista_k_i)))*np.log10((k_i)/(sum(k_j for k_j in lista_k_i)))
                for k_i in lista_k_i)
