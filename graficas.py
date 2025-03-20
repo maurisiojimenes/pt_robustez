@@ -23,6 +23,10 @@ def crear_grafica(modelo,n,m,p):
     G = nx.barabasi_albert_graph(n,m, seed = None)
   return G    
 
+def densidad(G,N):
+    numero_aristas = G.number_of_edges()
+    return (2*numero_aristas)/(N*(N-1)) if len(G) !=0 else 0
+
 
 def obtener_distribucion_grados(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
         N = len(G)
@@ -58,21 +62,32 @@ def momentos(G,n): # con está función vamos a obtener el n-ésimo momento de l
 def indice_robustez(G,f,w,criterio,k): 
     #G es la red
     #f es la medida de robustez que estamos usando
-    #w es el peso
+    #w string criterio
     #criterio es el criterio sobre el cuál estamos atacando la red 
     #k es el parámetro que nos dice el número de nodos que vamos a atacar, en general: k <= N 
     
+    
     N = len(G)
-    f_i = [f(G)] #f es una medida de robustez de G, entonces solo ocuparíamos en teoría a G para calcular f
-    w_i = [w(G)] #De la misma forma solo necesitariamos a G para calcular w
+
+    entropia_inicial = f(G)
+
+    f_i = [entropia_inicial] #f es una medida de robustez de G, entonces solo ocuparíamos en teoría a G para calcular 
+    
+    if w == 'constante':
+        w_i = [1] #De la misma forma solo necesitariamos a G para calcular w
+    elif w == 'entropia':
+        w_i = [entropia_inicial]
     
     #Para calcular el indice de robustez de f, necesitamos realizar hasta k ataques, en esté caso hasta k ataques
     #y calcular en cada ataque la f(G) y w(G)
     
     for i in range(k):
-        G = ataque(G,criterio)
-        f_i.append(G)
-        w_i.append(G)
+        G = ataques(G,criterio)
+        f_i.append(f(G))
+        if w == 'constante':
+            w_i.append(1) #De la misma forma solo necesitariamos a G para calcular w
+        elif w == 'entropia':
+            w_i.append(entropia_inicial)
         
     return (sum(w*f for w,f in zip(w_i,f_i)))/N
         

@@ -5,10 +5,10 @@ def entropia_normalizada_1(G): #Donde G es la red
     grados_nodos = list(G.degree())
     grados_nodos = [grados_nodos[i][1] for i in range(len(grados_nodos))]
     
-    k_min = min(grados_nodos)
-    k_max = max(grados_nodos)
+    k_min = min(grados_nodos) if len(grados_nodos) != 0 else 0
+    k_max = max(grados_nodos) if len(grados_nodos) != 0 else 0
     
-    lista_k_i = [(k_i - k_min)/(k_max - k_min) for k_i in grados_nodos]#Hasta aquí obtengo los k_i normalizados
+    lista_k_i = [(k_i - k_min)/(k_max - k_min) if k_max != k_min else (k_i - k_min) for k_i in grados_nodos]#Hasta aquí obtengo los k_i normalizados
     
     return -sum(((k_i)/(sum(k_j for k_j in lista_k_i if k_i>0)))*np.log((k_i)/(sum(k_j for k_j in lista_k_i if k_i>0))) 
                 for k_i in lista_k_i if k_i>0) #Aquí usamos el logaritmo natural 
@@ -18,10 +18,10 @@ def entropia_normalizada_2(G): # Donde G es la red y N es el número de nodos en
     grados_nodos = list(G.degree())
     grados_nodos = [grados_nodos[i][1] for i in range(len(grados_nodos))]
     
-    k_min = min(grados_nodos)
-    k_max = max(grados_nodos)
+    k_min = min(grados_nodos) if len(grados_nodos) != 0 else 0
+    k_max = max(grados_nodos) if len(grados_nodos) != 0 else 0
     
-    lista_k_i = [(k_i - k_min) / (k_max - k_min) for k_i in grados_nodos]  # Normalizamos los grados
+    lista_k_i = [(k_i - k_min) / (k_max - k_min) if k_max != k_min else (k_i - k_min) for k_i in grados_nodos]  # Normalizamos los grados
     
     # Calculamos la entropía con logaritmo en base 10
     return -sum(((k_i) / (sum(k_j for k_j in lista_k_i if k_i > 0))) * np.log10((k_i) / (sum(k_j for k_j in lista_k_i if k_i > 0))) 
@@ -33,8 +33,9 @@ def entropia_exponencial_1(G):#G es la red y q es un número natural
     
     lista_k_i = [np.power(k_i,1) for k_i in grados_nodos] #Hasta aquí obtenemos la lista de los (k_i)^q
     
-    return -sum(((k_i)/(sum(k_j for k_j in lista_k_i)))*np.log((k_i)/(sum(k_j for k_j in lista_k_i)))
-               for k_i in lista_k_i)
+    
+    return -sum(((k_i)/(sum(k_j for k_j in lista_k_i if k_i>0)))*np.log((k_i)/(sum(k_j for k_j in lista_k_i if k_i>0))) 
+                for k_i in lista_k_i if k_i>0)
     
 def entropia_exponencial_2(G):#G es la red y q es un número natural
     grados_nodos = list(G.degree())
@@ -42,8 +43,8 @@ def entropia_exponencial_2(G):#G es la red y q es un número natural
     
     lista_k_i = [np.power(k_i,1) for k_i in grados_nodos] #Hasta aquí obtenemos la lista de los (k_i)^q
  
-    return -sum(((k_i)/(sum(k_j for k_j in lista_k_i)))*np.log10((k_i)/(sum(k_j for k_j in lista_k_i)))
-               for k_i in lista_k_i)
+    return -sum(((k_i)/(sum(k_j for k_j in lista_k_i if k_i>0)))*np.log10((k_i)/(sum(k_j for k_j in lista_k_i if k_i>0))) 
+                for k_i in lista_k_i if k_i>0)
     
     
 def entropia_distribucion_1(G):
