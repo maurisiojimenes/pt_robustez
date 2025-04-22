@@ -3,9 +3,27 @@
     
     crear_gráfica: nos devuelve una red sintética que fue creada ya sea con el modelo de Albert-Barabási o el de Watts-Strogratz según se le      pida.
     
+    densidad: nos devuelve la densidad de una red. Necesitamos, además de la red G, N que será el número de nodos que había en la red antes 
+    de iniciar los ataques/fallos en la red.
+    
     obtener_distribucion_grados: nos devuelve la distribucion de grados de una red G en forma de lista en dónde la primera entrada es el         grado y la segunda entrada es la probabilidad de obtener un nodo con el grado de la primera entrada.  
    
-    grado_promedio: nos devuelve el grado promedio de la red que le pasemos
+    grado_promedio: nos devuelve el grado promedio de la red que le pasemos.
+    
+    componentes conexas: le damos la red y nos devuelve el número de componentes conexas que hay en la red, si no está desconectada lo que 
+    nos va a regresar va a ser 1
+    
+    momentos: Está función recibe una red y un parámetro n, lo que hace es calcular el n-ésimo momento (que depende del parámetro n que 
+    pasemos) a partir de la distribución de grados.
+    
+    indice_robustez: El índice de robustez es un valor que nos regresa un valor que indica que tan "robusta" es la red con respecto
+    a la medida de robustes que le pasemos. Estás medidas de robustes son caracterizadas por la propía red, puede ser el grado promedio
+    la densidad, el número de componentes conexas, etc. En general todas estás anteriormente mencionadas son básicas dentro de la redes
+    y nos indican de cierta forma que tan conectada está la red aún, pero son en general medidas a posteriori, es decir, que nos indican
+    el estado de la red más no lo predicen; queremos verificar si ocurre lo mismo al definir la entropia en una red y al utilizarla en
+    estos indices de robustez.
+    Esta función recibe la red G, una función f, un peso w (que por lo general será 1 o la entropía antes de recibir ataques/fallos), 
+    criterio de ataque, y un parámetro k que nos indica hasta donde vamos a atacar la red. 
     
     ataques: recibe una gráfica y un criterio de ataque, regresa la gráfica atacada por dicho criterio 
     
@@ -65,31 +83,28 @@ def indice_robustez(G,f,w,criterio,k):
     #w string criterio
     #criterio es el criterio sobre el cuál estamos atacando la red 
     #k es el parámetro que nos dice el número de nodos que vamos a atacar, en general: k <= N 
-    
-    
     N = len(G)
-
-    entropia_inicial = f(G)
-
-    f_i = [entropia_inicial] #f es una medida de robustez de G, entonces solo ocuparíamos en teoría a G para calcular 
+    f_inicial = f(G)
+    #Para calcular el indice de robustez de.-m  f, 
+    #necesitamos realizar hasta k ataques, en esté caso hasta k ataques
+    #y calcular en cada ataque la f(i) y w_i que en general va a ser constante
     
-    if w == 'constante':
-        w_i = [1] #De la misma forma solo necesitariamos a G para calcular w
-    elif w == 'entropia':
-        w_i = [entropia_inicial]
-    
-    #Para calcular el indice de robustez de f, necesitamos realizar hasta k ataques, en esté caso hasta k ataques
-    #y calcular en cada ataque la f(G) y w(G)
+    f_i = []
+    w_i = []
     
     for i in range(k):
         G = ataques(G,criterio)
         f_i.append(f(G))
-        if w == 'constante':
-            w_i.append(1) #De la misma forma solo necesitariamos a G para calcular w
-        elif w == 'entropia':
-            w_i.append(entropia_inicial)
-        
-    return (sum(w*f for w,f in zip(w_i,f_i)))/N
+        if w == 1:
+            w_i.append(1/N)
+        if w == 2:
+            w_i.append(1/f_inicial)
+        if w == 3:
+            w_i.append(1)
+   
+    indice_robustez = (sum(w*f for w,f in zip(w_i,f_i)))/k
+    
+    return indice_robustez
         
 
 def ataques(G,criterio):
