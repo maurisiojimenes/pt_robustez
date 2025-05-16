@@ -71,6 +71,14 @@ def componentes_conexas(G):
     componentes_conexas = list(nx.connected_components(G))
     return len(componentes_conexas)
 
+def LCC(G):
+    N = len(G)
+    if len(G) == 0:
+        return 0
+    componente_mas_grande = max(nx.connected_components(G), key=len)
+    proporcion = len(componente_mas_grande)/N
+    return proporcion
+
 def momentos(G,n): # con está función vamos a obtener el n-ésimo momento de la red G (de su distribución de grados)
     N = len(G)
     distribucion_grados = obtener_distribucion_grados(G)
