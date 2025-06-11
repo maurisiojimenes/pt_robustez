@@ -96,23 +96,28 @@ def indice_robustez(G,f,w,criterio,k):
     #Para calcular el indice de robustez de.-m  f, 
     #necesitamos realizar hasta k ataques, en esté caso hasta k ataques
     #y calcular en cada ataque la f(i) y w_i que en general va a ser constante
-    
+    critico = 0
     f_i = []
     w_i = []
     
     for i in range(k):
         G = ataques(G,criterio)
-        f_i.append(f(G))
+        f_G = f(G)
+        f_i.append(f_G)            
         if w == 1:
             w_i.append(1/N)
         if w == 2:
             w_i.append(1/f_inicial)
         if w == 3:
             w_i.append(1)
-   
+            
+        if f_G == 0:
+            critico = i
+            break
+            
     indice_robustez = (sum(w*f for w,f in zip(w_i,f_i)))/k
     
-    return indice_robustez
+    return indice_robustez, critico
         
 
 def ataques(G,criterio):
