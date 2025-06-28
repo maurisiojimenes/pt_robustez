@@ -41,7 +41,7 @@ def crear_grafica(modelo,n,m,p):
     G = nx.barabasi_albert_graph(n,m, seed = None)
   return G    
 
-def densidad(G,N):
+def densidad(G,N):#Aquí N es el número inicial de nodos, no podemos tomar el len(G) porque puede ser que ya hayamos atacado la red
     numero_aristas = G.number_of_edges()
     return (2*numero_aristas)/(N*(N-1)) if len(G) !=0 else 0
 
@@ -71,9 +71,12 @@ def componentes_conexas(G):
     componentes_conexas = list(nx.connected_components(G))
     return len(componentes_conexas)
 
-def LCC(G):
-    N = len(G)
-    if len(G) == 0:
+def LCC(G,criterio,N):  ## 1: es para medir el LCC con los nodos iniciales en la red, 2: es para medir el LCC con los nodos que restan en la red
+    if criterio == 1:
+        N=N
+    elif criterio == 2:
+        N=len(G)
+    if N == 0:
         return 0
     componente_mas_grande = max(nx.connected_components(G), key=len)
     proporcion = len(componente_mas_grande)/N
@@ -98,26 +101,23 @@ def indice_robustez(G,f,w,criterio,k):
     #y calcular en cada ataque la f(i) y w_i que en general va a ser constante
     critico = 0
     f_i = []
-    w_i = []
-    
     for i in range(k):
         G = ataques(G,criterio)
         f_G = f(G)
-        f_i.append(f_G)            
-        if w == 1:
-            w_i.append(1/N)
-        if w == 2:
-            w_i.append(1/f_inicial)
-        if w == 3:
-            w_i.append(1)
-            
-        if f_G == 0:
+        f_i.append(f_G)                
+        if f_G == 0: #El crítico es el i en dónde la función de robustez se hace 0 y por tanto también el índice de robustez
             critico = i
             break
             
-    indice_robustez = (sum(w*f for w,f in zip(w_i,f_i)))/k
+    if w == 1:
+        w_i = 1/N
+    elif w == 2:
+        w_i = 1/max(f_i)
+    elif w==3:
+        w_i=1
+    indice_robustez = (sum(w_i*f for f in f_i))/k
     
-    return indice_robustez, critico
+    return indice_robustez
         
 
 def ataques(G,criterio):

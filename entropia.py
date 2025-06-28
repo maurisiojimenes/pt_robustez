@@ -47,4 +47,32 @@ def entropia_distribucion(G):
     
     return -sum(p_k * np.log(p_k) for p_k in distribucion_grados)
 
+def completar_Q(P, Q):
+    dict_Q = dict(Q)
+    
+    Q_completa = [(grado, dict_Q.get(grado, 0)) for grado, _ in P]
+    
+    return Q_completa
 
+def DKL(P,Q): #En está función vamos a obtener dos funciones de densidad de probabilidad discretas, que son las distribuciones de grados y vamos a calcular}
+              #la DKL, en general se toma a P: distribución real, Q: distribución aproximada o fitting, queremos ver cuánta perdida de información hay 
+              #En cada ataque o fallo en la red
+    #Para empezar como Q viene de una red con al menos 1 nodo menos que P, va a ser menor que P, por lo que debemos corregir ese punto:
+    Q = completar_Q(P,Q)
+    
+    probabilidades_P = [probabilidad for _,probabilidad in P]
+
+    probabilidades_Q = [probabilidad for _,probabilidad in Q]
+
+    epsilon = 1e-10
+    probabilidades_P = [max(p, epsilon) for p in probabilidades_P]
+    probabilidades_Q = [max(q, epsilon) for q in probabilidades_Q]
+    
+    return sum(p * np.log(p / q) for p, q in zip(probabilidades_P, probabilidades_Q))
+        
+
+
+
+
+
+    
