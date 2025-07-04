@@ -41,9 +41,8 @@ def crear_grafica(modelo,n,m,p):
     G = nx.barabasi_albert_graph(n,m, seed = None)
   return G    
 
-def densidad(G,N):#Aquí N es el número inicial de nodos, no podemos tomar el len(G) porque puede ser que ya hayamos atacado la red
-    numero_aristas = G.number_of_edges()
-    return (2*numero_aristas)/(N*(N-1)) if len(G) !=0 else 0
+def densidad(G, N): #Aquí N es el número de nodos iniciales en la red para poder calcular la densidad con respecto a está N y no con los nodos restantes
+    return (2 * G.number_of_edges()) / (N * (N - 1)) if N > 1 else 0.0
 
 
 def obtener_distribucion_grados(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
@@ -64,23 +63,21 @@ def obtener_distribucion_grados(G): #Con está función recibimos una red y devo
 
     
 def grado_promedio(G):
-    grados = G.degree()
-    return sum(dict(grados).values())/len(G) if len(G) > 0 else 0.0
+    grados = (grado for _, grado in G.degree())
+    N = G.number_of_nodes()
+    return sum(grados) / N if N > 0 else 0.0
 
 def componentes_conexas(G):
-    componentes_conexas = list(nx.connected_components(G))
-    return len(componentes_conexas)
+    return sum(1 for _ in nx.connected_components(G))
 
-def LCC(G,criterio,N):  ## 1: es para medir el LCC con los nodos iniciales en la red, 2: es para medir el LCC con los nodos que restan en la red
-    if criterio == 1:
-        N=N
-    elif criterio == 2:
-        N=len(G)
-    if N == 0:
-        return 0
-    componente_mas_grande = max(nx.connected_components(G), key=len)
-    proporcion = len(componente_mas_grande)/N
-    return proporcion
+def LCC(G, criterio, N):# 1: es para medir el LCC con los nodos iniciales en la red, 2: es para medir el LCC con los nodos que restan en la red
+    if criterio == 2:
+        N = len(G)
+    if N == 0 or G.number_of_nodes() == 0:
+        return 0.0
+    largest_cc_size = max((len(c) for c in nx.connected_components(G)), default=0)
+    return largest_cc_size / N
+
 
 def momentos(G,n): # con está función vamos a obtener el n-ésimo momento de la red G (de su distribución de grados)
     N = len(G)
