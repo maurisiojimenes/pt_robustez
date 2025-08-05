@@ -44,16 +44,44 @@ def crear_grafica(modelo,n,m,p):
 def densidad(G, N): #Aquí N es el número de nodos iniciales en la red para poder calcular la densidad con respecto a está N y no con los nodos restantes
     return (2 * G.number_of_edges()) / (N * (N - 1)) if N > 1 else 0.0
 
+def obtener_distribucion_1(G):
+    lista_nodos = G.degree() #Hasta aquí vamos a tener una lista de tuplas de la forma (id_nodo,grado)
+    N = len(G)
+    if G.number_of_edges() != 0: #Estamos en el caso en el que el número de enlaces en la red es distinto de 0
+        
+        distribucion =[(id_nodo,grado / (2*G.number_of_edges())) for id_nodo,grado in lista_nodos]
+    
+    else: #En caso de que el número de enlaces en la red es 0, tenemos una red totalmente desconectada, así que regresamos una distribución de puros 0 o  equiprobable
+    
+        distribucion = [(id_nodo,1/N) for id_nodo,_ in lista_nodos]
+    
+    return distribucion
 
-def obtener_distribucion_grados(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
+def obtener_distribucion_2(G):
+    N = len(G)
+    lista_nodos = G.degree()
+    nodos = [grado for _,grado in lista_nodos]
+    
+    k_min = min(nodos) if len(nodos) != 0 else 0
+    k_max = max(nodos) if len(nodos) != 0 else 0
+    
+    if k_min == k_max:#En esté caso el grado mínimo es igual al grado máximo, es decir; todos los nodos tienen el mismo grado, por lo que regresamos una distribución equiprobable
+        return [(id_nodo,1/N) for id_nodo,_ in lista_nodos]
+
+    #En caso de que el grado mínimo no sea igual al grado máximo podemos normalizar los grados
+    lista_nodos_normalizada = [(id_nodo,(grado-k_min)/(k_max-k_min)) for id_nodo,grado in lista_nodos ]
+    
+    if G.number_of_edges() != 0 :#En caso de que la red no esté totalmente desconectada
+        return [(id_grado,grado / (2*G.number_of_edges())) for id_grado,grado in lista_nodos_normalizada]
+        
+def obtener_distribucion_3(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
         N = len(G)
-                
         lista_nodos = G.degree() #lista_nodos tiene una lista de los nodos con su identificador y su respectivo grado
         
-        lista_grados = [grados for _,grados in lista_nodos] #hacemos una lista que tenga únicamente los grados
+        grados = [grado for _,grado in lista_nodos] #hacemos una lista que tenga únicamente los grados
         
         #los contamos y con la siguiente linea obtenemos un diccionario ordenado por el grado y su frecuencia
-        distribucion_grados = Counter(lista_grados) 
+        distribucion_grados = Counter(grados) 
         distribucion_grados = dict(sorted(distribucion_grados.items()))
         
         #Por último armamos una lista con el grado, y la probabilidad de obtener dicho grado, y ésta seria nuestra distribución
@@ -61,6 +89,22 @@ def obtener_distribucion_grados(G): #Con está función recibimos una red y devo
         distribucion_grados = [(grado,frecuencia/N) for grado,frecuencia in distribucion_grados.items()]
         return distribucion_grados
 
+def obtener_distribucion_2_2(G):
+    N = len(G)
+    lista_nodos = G.degree()
+    nodos = [grado for _,grado in lista_nodos]
+    
+    k_min = min(nodos)
+    k_max = max(nodos)
+   
+    if k_min == k_max: #Si el grado mayor es igual al grado mayor, todos los nodos tienen el mismo grado, por lo que regresamos una distribución equiprobable de estos nodos
+        return [(id_nodo,1/N) for id_nodo,_ in lista_nodos]
+   
+    if G.number_of_edges() != 0:#En el caso de que la red no esté totalmente desconectada podemos regresar la distribución normal
+        return [(id_nodo,(grado-k_min)/(2*G.number_of_edges() - N*k_min)) for id_nodo,grado in lista_nodos]
+    
+    else:#En caso de que la red está totalmente desconectada, regresamos puros 0 en la distribución
+        return [(id_nodo,0) for id_nodo,_ in lista_nodos]
     
 def grado_promedio(G):
     grados = (grado for _, grado in G.degree())
@@ -99,7 +143,7 @@ def indice_robustez(G,f,w,criterio,k):
     critico = 0
     f_i = []
     for i in range(k):
-        G = ataques(G,criterio)
+        G,_ = ataques(G,criterio)
         f_G = f(G)
         f_i.append(f_G)                
         if f_G == 0: #El crítico es el i en dónde la función de robustez se hace 0 y por tanto también el índice de robustez
@@ -117,15 +161,16 @@ def indice_robustez(G,f,w,criterio,k):
     return indice_robustez
         
 
-def ataques(G,criterio):
+def ataques(G,criterio): #Vamos a hacer una modificación en está función, ahora quiero que además de regresar la red con el nodo elegido dropeado, también 
+                         #me regrese el nodo que fue elegido para dropear
     if criterio == 'random':
         nodos = list(G.nodes())
         nodo_elegido = random.choice(nodos)
         G.remove_node(nodo_elegido)
-        return G
+        return G, nodo_elegido
     elif criterio == 'degree':
         nodo_grado_mayor = max(G.degree, key=lambda x: x[1])[0]
         G.remove_node(nodo_grado_mayor)
-        return G
+        return G, nodo_grado_mayor
     
 
