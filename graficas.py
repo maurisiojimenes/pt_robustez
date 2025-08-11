@@ -74,7 +74,7 @@ def obtener_distribucion_2(G):
     if G.number_of_edges() != 0 :#En caso de que la red no esté totalmente desconectada
         return [(id_grado,grado / (2*G.number_of_edges())) for id_grado,grado in lista_nodos_normalizada]
         
-def obtener_distribucion_3(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
+def obtener_distribucion_2(G): #Con está función recibimos una red y devolvemos la distribución de grados de la red
         N = len(G)
         lista_nodos = G.degree() #lista_nodos tiene una lista de los nodos con su identificador y su respectivo grado
         
